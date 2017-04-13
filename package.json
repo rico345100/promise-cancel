@@ -1,6 +1,6 @@
 {
   "name": "promise-cancel",
-  "version": "1.0.1",
+  "version": "1.0.11",
   "description": "Module for adding cancel/timeout ability into the promise.",
   "main": "index.js",
   "scripts": {

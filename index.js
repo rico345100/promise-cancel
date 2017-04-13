@@ -15,14 +15,16 @@ function promiseCancel(f, options) {
 	var race = Promise.race([dummyRequest, f])
 	.then(function(data) {
 		if(canceled) {
-			return Promise.reject(
-				new Error('User cancelled promise.')
-			);
+			var error = new Error('User cancelled promise.');
+			error.type = 'cancel';
+
+			return Promise.reject(error);
 		}
 		else if(timeout) {
-			return Promise.reject(
-				new Error('Promise timeout')
-			);
+			var error = new Error('Promise timeout');
+			error.type = 'timeout';
+
+			return Promise.reject(error);
 		}
 		else {
 			return Promise.resolve(data);

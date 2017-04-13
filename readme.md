@@ -25,10 +25,12 @@ promiseCancel(request)
 .catch(...)
 ```
 
+When you cancel the promise, catch will got it.
+
 ## Examples
 This module is designed for adding canceling Fetch request. But it's not using Fetch API features inside, so you don't need to worry about that.
 
-### Cancel
+### Cancel Example
 ```javascript
 var request = fetch('/api/long');
 
@@ -49,7 +51,7 @@ setTimeout(() => {
 }, 5000);
 ```
 
-### Timeout
+### Timeout Example
 ```javascript
 var request = fetch('/api/long');
 
@@ -63,6 +65,22 @@ promiseCancel(request, { timeout: 3000 })
 .catch((err) => {
 	console.log('Catch err: ', err);
 });
+```
+
+## How to distinguish between Timeout or User cancellation?
+promise-cancel call the onRejected callback when it canceled or timed-out, but parameter of onReject callback is just Error object.
+
+Compare the message to distinguish is terrible idea, so I added a addtional property inside of Error, 'type'.
+Type can be 'undefined', 'cancel', 'timeout'. Of course, undefined means that there is no type, it's just coming from something else not user cancel or timed out.
+
+```javascript
+.catch((err) => {
+	if(err.type === 'timeout') { ... }
+	else if(err.type === 'cancel') { ... }
+	else {
+		...
+	}
+})
 ```
 
 

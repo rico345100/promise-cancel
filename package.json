@@ -1,0 +1,20 @@
+{
+  "name": "promise-cancel",
+  "version": "1.0.1",
+  "description": "Module for adding cancel/timeout ability into the promise.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rico345100/promise-cancel"
+  },
+  "keywords": [
+    "promise",
+    "cancel",
+    "timeout"
+  ],
+  "author": ".modernator",
+  "license": "MIT"
+}

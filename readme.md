@@ -2,6 +2,14 @@
 Add ability to cancel/timeout to your Promise! Note that this is not Promise implementation or polyfill!
 Make sure your JavaScript environment support Promise API first. If not, you can use plenty of polyfills such as [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch) or [Fetch polyfill](https://github.github.io/fetch/).
 
+## Update to 2.x
+I decided to update 2.x, which is little different usage from 1.x. In 1.x, I added cancel method directly the promise object. This is quite handy some situations, however you can loose this 'cancel' method if you are wrapping another promise inside.
+
+Now 2.x returns a object that contains both promise and cancel method, now you can access cancel function anywhere you do with promises.
+
+Updating isn't hard, so I recommend to use 2.x instead of 1.x. See the example to details.
+
+
 ## Usage
 Install via npm:
 
@@ -19,52 +27,40 @@ And wrap your promise object.
 
 ```javascript
 var request = new Promise(...);
+var handler = promiseCancel(request);
 
-promiseCancel(request)
+handler.promise
 .then(...)
-.catch(...)
+.catch(...);
+
+handler.cancel();	// Cancel promise immediately
 ```
 
-When you cancel the promise, catch will got it.
+When you cancel the promise, catch will get it.
 
 ## Examples
 This module is designed for adding canceling Fetch request. But it's not using Fetch API features inside, so you don't need to worry about that.
 
 ### Cancel Example
 ```javascript
-var request = fetch('/api/long');
+var request = doAsync();
+var cancelable = promiseCancel(request);
 
-promiseCancel(request)
-.then((response) => {
-	return response.json();
-})
-.then((data) => {
-	console.log('Got: ', data);
-})
-.catch((err) => {
-	console.log('Catch err: ', err);
-});
+cancelable.promise
+.then(() => console.log('Done!'))
+.catch((err) => console.log('Error', err));
 
-setTimeout(() => {
-	console.log('It takes too long. Just cancel it.');
-	request.cancel();
-}, 5000);
+setTimeout(cancelable.cancel, 3000);
 ```
 
 ### Timeout Example
 ```javascript
-var request = fetch('/api/long');
+var request = doAsync();
+var cancelable = promiseCancel(request, { timeout: 3000 });
 
-promiseCancel(request, { timeout: 3000 })
-.then((response) => {
-	return response.json();
-})
-.then((data) => {
-	console.log('Got: ', data);
-})
-.catch((err) => {
-	console.log('Catch err: ', err);
-});
+cancelable.promise
+.then(() => console.log('Done!'))
+.catch((err) => console.log('Error', err));
 ```
 
 ## How to distinguish between Timeout or User cancellation?
@@ -85,10 +81,12 @@ Type can be 'undefined', 'cancel', 'timeout'. Of course, undefined means that th
 
 
 ## API
-### promiseCancel(Promise p, Object options)
+### Object promiseCancel(Promise p, Object options)
 Create new cancelable promise. Possible options are:
-
 - Number options.timeout: Set timeout.
+
+Returning object contains "promise" object and "cancel" function.
+
 
 ### promiseCancel.cancel
 ### promiseCancel.abort

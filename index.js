@@ -1,27 +1,23 @@
-function promiseCancel(f, options) {
-	if(!f.then && !f.catch) {
-		throw new Error('Argument must be type of fetch.');
-	}
-
+const promiseCancel = (promise, options) => {
 	options = options || {};
-	var timeout = false;
-	var canceled = false;
-	var cancelResolve;
+	let timeout = options.timeout;
+	let canceled = false;
 
-	var dummyRequest = new Promise(function(resolve, reject) {
+	let cancelResolve;
+	let dummyRequest = new Promise(function(resolve, reject) {
 		cancelResolve = resolve;
 	});
 
-	var race = Promise.race([dummyRequest, f])
+	let race = Promise.race([dummyRequest, promise])
 	.then(function(data) {
 		if(canceled) {
-			var error = new Error('User cancelled promise.');
+			let error = new Error('User cancelled promise.');
 			error.type = 'cancel';
 
 			return Promise.reject(error);
 		}
 		else if(timeout) {
-			var error = new Error('Promise timeout');
+			let error = new Error('Promise timeout');
 			error.type = 'timeout';
 
 			return Promise.reject(error);
@@ -31,12 +27,6 @@ function promiseCancel(f, options) {
 		}
 	});
 
-	f.cancel = function() {
-		canceled = true;
-		cancelResolve();
-	};
-	f.abort = f.cancel;
-
 	if(options.timeout) {
 		setTimeout(function() {
 			timeout = true;
@@ -44,7 +34,16 @@ function promiseCancel(f, options) {
 		}, +options.timeout);
 	}
 
-	return race;
-}
+	function cancel() {
+		canceled = true;
+		cancelResolve();
+	}
+
+	return {
+		promise: race,
+		cancel: cancel,
+		abort: cancel
+	};
+};
 
 module.exports = promiseCancel;

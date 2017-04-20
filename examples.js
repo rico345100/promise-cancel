@@ -2,49 +2,32 @@ var promiseCancel = require('./index');
 
 // simulate just plain fetch
 // it will just return the response immediately.
-var request = fetch('/api');
-var request = fetch('/api/long');	// but this API takes 10 seconds to complete request.
 
-promiseCancel(request)
-.then((response) => {
-	return response.json();
-})
-.then((data) => {
-	console.log('Got: ', data);
-})
-.catch((err) => {
-	console.log('Catch err: ', err);
-});
+function doAsync() {
+	return new Promise((resolve, reject) => {
+		setTimeout(resolve, 5000);
+	});
+}
 
-// Let's cancel the fetch if it takes too long.
-// var request = fetch('/api/long');
+// Basic promise usage
+// doAsync()
+// .then(() => console.log('Done!'))
+// .catch((err) => console.log('Error'));
 
-// promiseCancel(request)
-// .then((response) => {
-// 	return response.json();
-// })
-// .then((data) => {
-// 	console.log('Got: ', data);
-// })
-// .catch((err) => {
-// 	console.log('Catch err: ', err);
-// });
+// Cancelable example
+// var request = doAsync();
+// var cancelable = promiseCancel(request);
 
-// setTimeout(() => {
-// 	console.log('It takes too long. Just cancel it.');
-// 	request.cancel();
-// }, 5000);
+// cancelable.promise
+// .then(() => console.log('Done!'))
+// .catch((err) => console.log('Error', err));
 
-// Or, using timeout option to call cancel automatically.
-// var request = fetch('/api/long');
+// setTimeout(cancelable.cancel, 3000);
 
-// promiseCancel(request, { timeout: 3000 })
-// .then((response) => {
-// 	return response.json();
-// })
-// .then((data) => {
-// 	console.log('Got: ', data);
-// })
-// .catch((err) => {
-// 	console.log('Catch err: ', err);
-// });
+// Timeout example
+var request = doAsync();
+var cancelable = promiseCancel(request, { timeout: 3000 });
+
+cancelable.promise
+.then(() => console.log('Done!'))
+.catch((err) => console.log('Error', err));

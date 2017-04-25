@@ -1,23 +1,23 @@
-const promiseCancel = (promise, options) => {
+var promiseCancel = function(promise, options) {
 	options = options || {};
-	let timeout = options.timeout;
-	let canceled = false;
+	var timeout = options.timeout;
+	var canceled = false;
 
-	let cancelResolve;
-	let dummyRequest = new Promise(function(resolve, reject) {
+	var cancelResolve;
+	var dummyRequest = new Promise(function(resolve, reject) {
 		cancelResolve = resolve;
 	});
 
-	let race = Promise.race([dummyRequest, promise])
+	var race = Promise.race([dummyRequest, promise])
 	.then(function(data) {
 		if(canceled) {
-			let error = new Error('User cancelled promise.');
+			var error = new Error('User cancelled promise.');
 			error.type = 'cancel';
 
 			return Promise.reject(error);
 		}
 		else if(timeout) {
-			let error = new Error('Promise timeout');
+			var error = new Error('Promise timeout');
 			error.type = 'timeout';
 
 			return Promise.reject(error);

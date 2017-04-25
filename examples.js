@@ -30,4 +30,4 @@ var cancelable = promiseCancel(request, { timeout: 3000 });
 
 cancelable.promise
 .then(() => console.log('Done!'))
-.catch((err) => console.log('Error', err));
+.catch((err) => console.log('Error'));
